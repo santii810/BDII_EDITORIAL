@@ -1,0 +1,111 @@
+/*	Busca entre los empleados si existe alguno que no haya sido asignado a alguna publicación */
+CREATE OR REPLACE
+PROCEDURE comprobarAsignacionPublicacion 
+IS
+  coincidencias NUMBER;
+  empNoAsig NUMBER;
+  nifEmpleado EMPLEADO.NIF_EMPLEADO%TYPE;
+  nifResponsable EMPLEADO.NIF_EMPLEADO%TYPE;
+  nifTraductor EMPLEADO.NIF_EMPLEADO%TYPE;
+  nifDiseNador EMPLEADO.NIF_EMPLEADO%TYPE;
+  nifRedactor EMPLEADO.NIF_EMPLEADO%TYPE;
+  
+  CURSOR C_EMPLEADO IS     SELECT NIF_EMPLEADO    FROM EMPLEADO     ORDER BY NIF_EMPLEADO;
+  CURSOR C_REDACTOR IS     SELECT NIF_EMPLEADO    FROM REDACTOR     ORDER BY NIF_EMPLEADO;
+  CURSOR C_TRADUCTOR IS    SELECT NIF_EMPLEADO    FROM TRADUCTOR    ORDER BY NIF_EMPLEADO;
+  CURSOR C_DISENADOR IS    SELECT NIF_EMPLEADO    FROM DISENADOR    ORDER BY NIF_EMPLEADO;
+  CURSOR C_RESPONSABLE IS  SELECT NIF_EMPLEADO    FROM RESPONSABLE  ORDER BY NIF_EMPLEADO;
+       
+  
+BEGIN 
+
+empNoAsig := 0;
+OPEN  C_EMPLEADO ;
+OPEN  C_REDACTOR ;
+OPEN  C_TRADUCTOR  ;
+OPEN  C_DISENADOR ;
+OPEN  C_RESPONSABLE ;
+
+/*FETCH C_EMPLEADO INTO nifEmpleado;*/
+FETCH C_REDACTOR INTO nifRedactor;
+FETCH C_TRADUCTOR INTO nifTraductor;
+FETCH C_DISENADOR INTO nifDiseNador;
+FETCH C_RESPONSABLE INTO nifResponsable;
+
+
+ LOOP
+ coincidencias := 0;
+    FETCH C_EMPLEADO INTO nifEmpleado;
+     EXIT WHEN C_EMPLEADO%NOTFOUND;
+   
+      IF (nifEmpleado = nifRedactor)
+      THEN 
+        FETCH C_REDACTOR INTO nifRedactor;
+        coincidencias:=coincidencias + 1;
+      END IF;
+      
+      IF (nifEmpleado = nifTraductor)
+      THEN 
+        FETCH C_TRADUCTOR INTO nifTraductor;
+        coincidencias:=coincidencias + 1;
+      END IF;
+      
+      IF (nifEmpleado = nifDiseNador)
+      THEN 
+        FETCH C_DISENADOR INTO nifDiseNador;
+        coincidencias:=coincidencias + 1;
+      END IF;
+      
+      IF (nifEmpleado = nifResponsable)
+      THEN 
+        FETCH C_RESPONSABLE INTO nifResponsable;
+        coincidencias:=coincidencias + 1;
+      END IF;
+
+   /*   DBMS_OUTPUT.PUT_LINE('Empleado: ' || nifEmpleado || ' coincidencias' || coincidencias); */
+      IF(coincidencias = 0)
+      THEN 
+         DBMS_OUTPUT.PUT_LINE('Empleado: ' || nifEmpleado || ' no asignado a ninguna publicación'); 
+         empNoAsig := empNoAsig +1;
+      END IF;
+          
+   
+  END LOOP;
+  
+  IF(empNoAsig = 0)
+  THEN 
+        DBMS_OUTPUT.PUT_LINE('Todos los empleados estan asignados a algunan publicación'); 
+  END IF;
+ 
+END comprobarAsignacionPublicacion;
+/
+show errors;
+
+
+
+/* Comprobacion */
+exec comprobarAsignacionPublicacion;
+DELETE FROM REDACTOR WHERE NIF_EMPLEADO='54985513H';
+exec comprobarAsignacionPublicacion;
+INSERT INTO REDACTOR VALUES('54985513H','DISTANCIA');
+
+
+
+/* Retorna los códigos de los ejemplares vendidos en función de una fecha pasada */
+CREATE OR REPLACE
+FUNCTION mostrarVentas(fechaVenta IN DATE)
+RETURN INT
+IS
+codigo INT;
+BEGIN
+SELECT COD_EJEMPLAR INTO codigo FROM COMPRA WHERE FECHA_COMPRA=fechaVenta ORDER BY COD_EJEMPLAR;
+RETURN codigo;
+END mostrarVentas;
+
+
+
+/* Comprobacion */
+exec mostrarVentas('15/04/1995');
+DELETE FROM COMPRA WHERE FECHA_COMPRA='15/04/1995';
+exec mostrarVentas('15/04/1995');
+INSERT INTO COMPRA VALUES('25','25','50','15/04/1995');
