@@ -18,9 +18,8 @@ IS
   CURSOR C_REDACTOR IS     SELECT NIF_EMPLEADO    FROM REDACTOR     ORDER BY NIF_EMPLEADO;
   CURSOR C_TRADUCTOR IS    SELECT NIF_EMPLEADO    FROM TRADUCTOR    ORDER BY NIF_EMPLEADO;
   CURSOR C_DISENADOR IS    SELECT NIF_EMPLEADO    FROM DISENADOR    ORDER BY NIF_EMPLEADO;
-  CURSOR C_RESPONSABLE IS  SELECT NIF_EMPLEADO    FROM RESPONSABLE  ORDER BY NIF_EMPLEADO;
-       
-  
+  CURSOR C_RESPONSABLE IS  SELECT NIF_EMPLEADO    FROM RESPONSABLE  ORDER BY NIF_EMPLEADO;       
+
 BEGIN 
 
 empNoAsig := 0;
@@ -104,6 +103,7 @@ INSERT INTO REDACTOR VALUES('54985513H','DISTANCIA');
 
 
 
+______________________________________________________________________________________________________________________________________________________________________
 
 
 
@@ -137,7 +137,7 @@ FROM EMPLEADO;
 
 
 
-
+______________________________________________________________________________________________________________________________________________________________________
 
 
 
@@ -211,6 +211,7 @@ WHERE  E.NIF_EMPLEADO = CE.NIF_CLI_EMP;
  
  
  
+ ______________________________________________________________________________________________________________________________________________________________________
  
  
  
@@ -221,9 +222,7 @@ WHERE  E.NIF_EMPLEADO = CE.NIF_CLI_EMP;
  
  
  
- 
- 
-
+ /* Muestra una lista de los ejemplares que aun no han sido vendidos*/
 
 
 CREATE OR REPLACE
@@ -248,7 +247,7 @@ FETCH C_COMPRA INTO codCompra;
       THEN 
         FETCH C_COMPRA INTO codCompra;
       ELSE
-        DBMS_OUTPUT.PUT_LINE('Ejemplar: ' || codEjemplar || ' sigue en stock'); 
+        DBMS_OUTPUT.PUT_LINE('Ejemplar: ' || codEjemplar || ' continua en stock'); 
       END IF;  
   END LOOP;
   
@@ -257,6 +256,10 @@ END ejemplaresNoVendidos;
 
 
 
+/* COMPROBACION */
+exec EJEMPLARESNOVENDIDOS();
+delete from compra where cod_ejemplar between 30 AND 40;
+exec EJEMPLARESNOVENDIDOS();
 
 
 
@@ -266,34 +269,7 @@ END ejemplaresNoVendidos;
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+______________________________________________________________________________________________________________________________________________________________________
 
 
 
@@ -417,4 +393,6 @@ CLOSE C_EMP;
 
 
 END;
+
+______________________________________________________________________________________________________________________________________________________________________
  
